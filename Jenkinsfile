@@ -24,11 +24,10 @@ pipeline {
         }
         stage('Docker Login & Push') {
             steps {
-                script {
-                    withDockerRegistry(credentialsId: "${DOCKER_HUB_CRED}", url: '') {
-                        sh "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                        sh "docker push ${DOCKER_IMAGE}:latest"
-                    }
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CRED}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
+                    sh "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    sh "docker push ${DOCKER_IMAGE}:latest"
                 }
             }
         }
@@ -38,4 +37,4 @@ pipeline {
             sh "docker rmi ${DOCKER_IMAGE}:${BUILD_NUMBER} || true"
         }
     }
-}
+} 
