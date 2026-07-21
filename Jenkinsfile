@@ -2,10 +2,9 @@ pipeline {
     agent any
 
     environment {
-        // Change 'your-dockerhub-username' to your actual Docker Hub username
-        DOCKER_IMAGE = 'your-dockerhub-username/sample-app'
-        DOCKER_HUB_CRED = 'docker-hub-credentials'
-    }
+    DOCKER_IMAGE = 'ghoi73787-ship-it/sample-app'  // Updated with your actual username
+    DOCKER_HUB_CRED = 'docker-hub-credentials'
+}
 
     stages {
         stage('Clone Repository') {
