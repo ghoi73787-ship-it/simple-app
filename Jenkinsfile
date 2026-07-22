@@ -7,21 +7,13 @@ pipeline {
     }
 
     stages {
-        stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
-        stage('Clone Repository') {
-            steps {
-                echo 'Repository Cloned'
-            }
-        }
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
+                // Build with both BUILD_NUMBER and latest tags
+                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -t ${DOCKER_IMAGE}:latest ."
             }
         }
+
         stage('Docker Login & Push') {
             steps {
                 withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CRED}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -32,9 +24,11 @@ pipeline {
             }
         }
     }
+
     post {
         always {
-            sh "docker rmi ${DOCKER_IMAGE}:${BUILD_NUMBER} || true"
+            // Clean up both local Docker images off the agent
+            sh "docker rmi ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest || true"
         }
     }
-} 
+}
